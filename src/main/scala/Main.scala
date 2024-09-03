@@ -1,6 +1,6 @@
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, lit}
 import org.apache.spark.sql.types.StringType
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession, functions}
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -41,11 +41,17 @@ object Main {
 //    df.select(dateColumn, openColumn, closeColumn).show()
     val calculatedColumn = openColumn + (2.0)
     val stringColumn = calculatedColumn.cast(StringType)
-    df.select(openColumn, calculatedColumn, stringColumn)
+
+    // create a Column with a literal value
+    val litColumn = lit(2.0)
+    val concatenatedColumn = functions.concat(openColumn, calculatedColumn, stringColumn, lit("toto"), litColumn)
+
+    df.select(openColumn, calculatedColumn, stringColumn, concatenatedColumn)
       .filter(calculatedColumn > 2.5)
       // Must use "===" to differentiate from Scala's "=="
-      .filter(openColumn === calculatedColumn)
-      .show()
+      //.filter(openColumn === calculatedColumn)
+      // prevent results from being truncated in the output
+      .show(truncate = false)
 
   }
 }
