@@ -1,5 +1,6 @@
 # source data
 /src/main/resources/*.xml
+/src/main/resources/*.csv
 
 # scala-cli, bloop, metals
 .bsp/

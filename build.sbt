@@ -1,11 +1,10 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
-ThisBuild / scalaVersion := "2.12.13"
+ThisBuild / scalaVersion := "2.13.12"
 lazy val root = (project in file("."))
   .settings(
     name := "scala-with-spark"
   )
-
 
 val sparkVersion = "3.5.0"
 
