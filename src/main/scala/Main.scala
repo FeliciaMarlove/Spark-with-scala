@@ -1,4 +1,5 @@
 import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object Main {
@@ -33,10 +34,18 @@ object Main {
     // Good old SQL Select =)
     // Either with a list of Strings or a list of Columns
     //df.select("Date", "Open", "Close").show()
-    val dateColumn = df("Date")
+//    val dateColumn = df("Date")
     val openColumn = col("Open")
-    import spark.implicits._
-    val closeColumn = $"Close"
-    df.select(dateColumn, openColumn, closeColumn).show()
+//    import spark.implicits._
+//    val closeColumn = $"Close"
+//    df.select(dateColumn, openColumn, closeColumn).show()
+    val calculatedColumn = openColumn + (2.0)
+    val stringColumn = calculatedColumn.cast(StringType)
+    df.select(openColumn, calculatedColumn, stringColumn)
+      .filter(calculatedColumn > 2.5)
+      // Must use "===" to differentiate from Scala's "=="
+      .filter(openColumn === calculatedColumn)
+      .show()
+
   }
 }
