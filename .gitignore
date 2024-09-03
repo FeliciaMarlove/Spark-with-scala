@@ -1,3 +1,6 @@
+# source data
+/src/main/resources/*.xml
+
 # scala-cli, bloop, metals
 .bsp/
 .bloop/
@@ -42,4 +45,3 @@ bin/
 
 # general
 *.class
-
