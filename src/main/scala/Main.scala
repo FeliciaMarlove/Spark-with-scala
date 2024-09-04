@@ -29,13 +29,13 @@ object Main {
       .csv("./src/main/resources/AAPL.csv")
 
     // by default prints the first 20 lines
-    //df.show()
+    // df.show()
     // describes the schema of the data with data type and fg nullable
-    //df.printSchema()
+    // df.printSchema()
 
     // Good old SQL Select =)
     // Either with a list of Strings or a list of Columns
-    //df.select("Date", "Open", "Close").show()
+    // df.select("Date", "Open", "Close").show()
 //    val dateColumn = df("Date")
     val openColumn = col("Open")
 //    import spark.implicits._
@@ -46,20 +46,32 @@ object Main {
 
     // create a Column with a literal value
     val litColumn = lit(2.0)
-    val concatenatedColumn = functions.concat(openColumn, calculatedColumn, stringColumn, lit("toto"), litColumn)
-
-    df.withColumnRenamed("Close", "close")
-      .withColumnRenamed("Open", "open")
-      .show()
-
-    val renamedColumns = List(
-      col("Date").as("date"),
-      concatenatedColumn.as("key"),
-      stringColumn.as("string"),
-      col("Adj Close").as("adjClose")
+    val concatenatedColumn = functions.concat(
+      openColumn,
+      calculatedColumn,
+      stringColumn,
+      lit("toto"),
+      litColumn
     )
 
-    // : _* transform a sequence into individual elements (=> varargs)
-    df.select(renamedColumns: _*).show()
+//    df.withColumnRenamed("Close", "close")
+//      .withColumnRenamed("Open", "open")
+//      .show()
+//
+//    val renamedColumns = List(
+//      col("Date").as("date"),
+//      concatenatedColumn.as("key"),
+//      stringColumn.as("string"),
+//      col("Adj Close").as("adjClose")
+//    )
+//
+//    // : _* transform a sequence into individual elements (=> varargs)
+//    df.select(renamedColumns: _*).show()
+
+    df.select(
+      df.columns.map(columnName =>
+        col(columnName).as(columnName.toLowerCase)
+      ): _*
+    ).show()
   }
 }
