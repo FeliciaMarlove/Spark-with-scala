@@ -68,10 +68,17 @@ object Main {
 //    // : _* transform a sequence into individual elements (=> varargs)
 //    df.select(renamedColumns: _*).show()
 
-    df.select(
-      df.columns.map(columnName =>
-        col(columnName).as(columnName.toLowerCase)
-      ): _*
-    ).show()
+    val stockData = df
+      .select(
+        df.columns.map(columnName =>
+          col(columnName).as(columnName.toLowerCase)
+        ): _*
+      )
+      .withColumn("difference", col("close") - col("open"))
+      // "where" is an alias for "filter"
+      //.where(col("open")+((col("open") / 100) * 10) < col("close"))
+      .where(col("close") > col("open") * 1.1) // closing price is 10% higher than opening price
+
+    stockData.show()
   }
 }
