@@ -1,3 +1,4 @@
+import org.apache.spark.sql
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{col, row_number, year}
 import org.apache.spark.sql.{DataFrame, SparkSession, functions}
@@ -9,34 +10,41 @@ object Main {
     val spark = SparkSession
       .builder()
       .appName("Scala-with-Spark")
-      // instantiate a local instance with the number of executors available on the machine
       .master(
         "local[*]"
       )
-      // if Spark cannot resolve the local host:
-      // .config("spark.driver.bindAddress", "127.0.0.1")
       .getOrCreate()
 
-    // type DataFrame = Dataset[Row]
-    // "collection of generic rows"
-    val df: DataFrame = spark.read // DataFrame reader
-      // csv options https://spark.apache.org/docs/latest/sql-data-sources-csv.html#data-source-option
+    val df: DataFrame = spark.read
       .option("header", value = true)
-      // tries to infer the schema (= guess the types instead of giving "string" type to all columns)
-      // /!\ requires 1 extra pass over the data => compute cost!
       .option("inferSchema", value = true)
-      // returns a DataFrame
       .csv("./src/main/resources/AAPL.csv")
 
-    import spark.implicits._
+    val renamedColumns = List(
+      col("Date").as("date"),
+      col("Open").as("open"),
+      col("High").as("high"),
+      col("Low").as("low"),
+      col("Close").as("close"),
+      col("Ad Close").as("adjClose"),
+      col("Volumne").as("volumne")
+    )
 
-    val window = Window.partitionBy(year($"Date").as("year")).orderBy($"Close".desc)
+    val stockData = df.select(renamedColumns: _*)
+
+    val highestClosingPricesPerYear = getHighestClosingPricesPerYear(stockData)
+  }
+
+  def getHighestClosingPricesPerYear(df: DataFrame): DataFrame = {
+    val spark = df.sparkSession
+    import spark.implicits._
+    val window = Window.partitionBy(year($"date").as("yera")).orderBy($"close".desc)
     df
       .withColumn("rank", row_number().over(window))
       .filter($"rank" === 1)
-      .sort($"Close".desc)
-      .drop($"rank")
-      // print the logical computation plan (AST = Abstract Syntax Tree)
-      .explain(extended = true)
+      .sort($"close".desc)
   }
+
+  def add(x: Int, y: Int): Int = x + y
+
 }

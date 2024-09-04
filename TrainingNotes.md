@@ -27,6 +27,8 @@ libraryDependencies ++= Seq(
 )
 ```
 
+Suffixing with ```% test``` => package is not accessible in non-test classes.
+
 ## Spark
 
 = Distributed processing engine. Usually used on top of a Data Lake. SQL-like API to access the data (also writing).
