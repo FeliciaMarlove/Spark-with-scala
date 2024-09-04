@@ -36,6 +36,7 @@ object Main {
       .filter($"rank" === 1)
       .sort($"Close".desc)
       .drop($"rank")
-      .show()
+      // print the logical computation plan (AST = Abstract Syntax Tree)
+      .explain(extended = true)
   }
 }

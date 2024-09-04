@@ -38,3 +38,7 @@ Driver processes the code we wrote then plans and distributes tasks among the wo
 
 Base for parallelization. Aim at equally sized partitions to distribute the load (but often challenging because of the nature of real-life data => on of the major challenges regarding performance).
 Same size = each worker will take the same time to complete their tasks. 
+
+## Lazy evaluation
+
+Transformations simply add a step to the AST (lazy), actions triggers the execution of the AST => result is only evaluate when we want to see it.
