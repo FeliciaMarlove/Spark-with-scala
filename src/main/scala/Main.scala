@@ -1,4 +1,5 @@
-import org.apache.spark.sql.functions.{col, year}
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions.{col, row_number, year}
 import org.apache.spark.sql.{DataFrame, SparkSession, functions}
 
 // data sample for exercise https://www.kaggle.com/datasets/jacksoncrow/stock-market-dataset AAPL.csv
@@ -29,15 +30,12 @@ object Main {
 
     import spark.implicits._
 
+    val window = Window.partitionBy(year($"Date").as("year")).orderBy($"Close".desc)
     df
-      .groupBy(year($"Date").as("year"))
-      .agg(functions.max($"Close").as("maxClose"), functions.avg($"Close").as("avgClose"))
-      .sort($"maxClose".desc)
+      .withColumn("rank", row_number().over(window))
+      .filter($"rank" === 1)
+      .sort($"Close".desc)
+      .drop($"rank")
       .show()
-
-    df.groupBy(year($"Date").as("year"))
-      // takes strings and not columns => not as straightforward to rename columns
-      // using shorthand doesn't allow to chain aggregation functions
-      .max("Close", "High")
   }
 }
