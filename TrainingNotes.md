@@ -33,3 +33,8 @@ libraryDependencies ++= Seq(
 Master-Slave architecture. 1 Driver on the master node for scheduling tasks on the cluster + many workers for the workload (+ Cluster manager -> instantiate the Driver and the Workers and manage resource allocation in the cluster).
 Driver processes the code we wrote then plans and distributes tasks among the workers.
 => might seem slow in local development => really shines when there are parallelization capabilities and big files to handle.
+
+## Partitioning
+
+Base for parallelization. Aim at equally sized partitions to distribute the load (but often challenging because of the nature of real-life data => on of the major challenges regarding performance).
+Same size = each worker will take the same time to complete their tasks. 
