@@ -2,6 +2,8 @@ import org.apache.spark.sql.functions.{col, lit}
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SparkSession, functions}
 
+// data sample for exercise https://www.kaggle.com/datasets/jacksoncrow/stock-market-dataset AAPL.csv
+
 object Main {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
@@ -46,12 +48,18 @@ object Main {
     val litColumn = lit(2.0)
     val concatenatedColumn = functions.concat(openColumn, calculatedColumn, stringColumn, lit("toto"), litColumn)
 
-    df.select(openColumn, calculatedColumn, stringColumn, concatenatedColumn)
-      .filter(calculatedColumn > 2.5)
-      // Must use "===" to differentiate from Scala's "=="
-      //.filter(openColumn === calculatedColumn)
-      // prevent results from being truncated in the output
-      .show(truncate = false)
+    df.withColumnRenamed("Close", "close")
+      .withColumnRenamed("Open", "open")
+      .show()
 
+    val renamedColumns = List(
+      col("Date").as("date"),
+      concatenatedColumn.as("key"),
+      stringColumn.as("string"),
+      col("Adj Close").as("adjClose")
+    )
+
+    // : _* transform a sequence into individual elements (=> varargs)
+    df.select(renamedColumns: _*).show()
   }
 }
