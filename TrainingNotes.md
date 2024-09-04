@@ -26,3 +26,10 @@ libraryDependencies ++= Seq(
     "org.apache.spark" %% "spark-sql" % sparkVersion
 )
 ```
+
+## Spark
+
+= Distributed processing engine. Usually used on top of a Data Lake. SQL-like API to access the data (also writing).
+Master-Slave architecture. 1 Driver on the master node for scheduling tasks on the cluster + many workers for the workload (+ Cluster manager -> instantiate the Driver and the Workers and manage resource allocation in the cluster).
+Driver processes the code we wrote then plans and distributes tasks among the workers.
+=> might seem slow in local development => really shines when there are parallelization capabilities and big files to handle.
