@@ -1,5 +1,4 @@
-import org.apache.spark.sql.functions.{col, lit}
-import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.functions.{col, year}
 import org.apache.spark.sql.{DataFrame, SparkSession, functions}
 
 // data sample for exercise https://www.kaggle.com/datasets/jacksoncrow/stock-market-dataset AAPL.csv
@@ -28,57 +27,17 @@ object Main {
       // returns a DataFrame
       .csv("./src/main/resources/AAPL.csv")
 
-    // by default prints the first 20 lines
-    // df.show()
-    // describes the schema of the data with data type and fg nullable
-    // df.printSchema()
+    import spark.implicits._
 
-    // Good old SQL Select =)
-    // Either with a list of Strings or a list of Columns
-    // df.select("Date", "Open", "Close").show()
-//    val dateColumn = df("Date")
-    val openColumn = col("Open")
-//    import spark.implicits._
-//    val closeColumn = $"Close"
-//    df.select(dateColumn, openColumn, closeColumn).show()
-    val calculatedColumn = openColumn + (2.0)
-    val stringColumn = calculatedColumn.cast(StringType)
+    df
+      .groupBy(year($"Date").as("year"))
+      .agg(functions.max($"Close").as("maxClose"), functions.avg($"Close").as("avgClose"))
+      .sort($"maxClose".desc)
+      .show()
 
-    // create a Column with a literal value
-    val litColumn = lit(2.0)
-    val concatenatedColumn = functions.concat(
-      openColumn,
-      calculatedColumn,
-      stringColumn,
-      lit("toto"),
-      litColumn
-    )
-
-//    df.withColumnRenamed("Close", "close")
-//      .withColumnRenamed("Open", "open")
-//      .show()
-//
-//    val renamedColumns = List(
-//      col("Date").as("date"),
-//      concatenatedColumn.as("key"),
-//      stringColumn.as("string"),
-//      col("Adj Close").as("adjClose")
-//    )
-//
-//    // : _* transform a sequence into individual elements (=> varargs)
-//    df.select(renamedColumns: _*).show()
-
-    val stockData = df
-      .select(
-        df.columns.map(columnName =>
-          col(columnName).as(columnName.toLowerCase)
-        ): _*
-      )
-      .withColumn("difference", col("close") - col("open"))
-      // "where" is an alias for "filter"
-      //.where(col("open")+((col("open") / 100) * 10) < col("close"))
-      .where(col("close") > col("open") * 1.1) // closing price is 10% higher than opening price
-
-    stockData.show()
+    df.groupBy(year($"Date").as("year"))
+      // takes strings and not columns => not as straightforward to rename columns
+      // using shorthand doesn't allow to chain aggregation functions
+      .max("Close", "High")
   }
 }
